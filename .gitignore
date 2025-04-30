@@ -21,6 +21,8 @@ tools/apktool.jar
 build/
 develop-eggs/
 dist/
+.tmp/
+.idea/
 downloads/
 eggs/
 .eggs/
