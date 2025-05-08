@@ -22,7 +22,7 @@ build/
 develop-eggs/
 dist/
 .tmp/
-.idea
+.idea/
 downloads/
 eggs/
 .eggs/
