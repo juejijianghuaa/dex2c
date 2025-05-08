@@ -136,7 +136,7 @@ def clean_tmp_directory():
     tmpdir = ".tmp"
     try:
         Logger.info("Removing .tmp folder")
-        rmtree(tmpdir)
+#         rmtree(tmpdir)
     except OSError:
         run(["rd", "/s", "/q", tmpdir], shell=True)
 
@@ -1099,7 +1099,7 @@ if __name__ == "__main__":
         "-p",
         "--obfuscate",
         action="store_true",
-        default=False,
+        default=True,
         help="Obfuscate string constants.",
     )
     parser.add_argument(

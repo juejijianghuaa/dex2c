@@ -278,16 +278,9 @@ Java_amimo_dcc_DccApplication__0003cinit_0003e__(JNIEnv *env, jobject thiz) {
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
-
     if (vm->GetEnv((void **) &env, JNI_VERSION_1_6) != JNI_OK) {
-        return JNI_ERR;
+       return JNI_ERR;
     }
-
-    jclass clz = env->FindClass("amimo/dcc/DccApplication");
-
-    if (!clz)
-        exit(1);
-
     cache_well_known_classes(env);
     const char *result = dynamic_register_compile_methods(env);
     if (result != nullptr)

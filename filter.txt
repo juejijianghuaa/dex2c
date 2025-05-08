@@ -2,4 +2,7 @@
 
 # Protect all methods in all classes
 # Not recommended for real world applications.
-.*
+com.github.catvod.spider.Bili;.*
+com.github.catvod.utils.server.Server;.*
+com.github.catvod.en.NetPan;.*
+com.github.catvod.en.BaseApi;.*
