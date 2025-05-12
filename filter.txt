@@ -3,6 +3,10 @@
 # Protect all methods in all classes
 # Not recommended for real world applications.
 com.github.catvod.spider.Bili;.*
+com.github.catvod.spider.TgYunDouBanPan;.*
+com.github.catvod.spider.TgYunPanLocal;.*
+com.github.catvod.spider.Wogg;.*
+com.github.catvod.spider.kongbai;.*
 com.github.catvod.utils.server.Server;.*
 com.github.catvod.en.NetPan;.*
 com.github.catvod.en.BaseApi;.*
