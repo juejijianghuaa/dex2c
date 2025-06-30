@@ -2,6 +2,7 @@
 
 # Protect all methods in all classes
 # Not recommended for real world applications.
+# python dcc.py -a input.apk -o output.apk
 com.github.catvod.spider.Bili;.*
 com.github.catvod.spider.TgYunDouBanPan;.*
 com.github.catvod.spider.TgYunPanLocal;.*
