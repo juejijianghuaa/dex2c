@@ -78,6 +78,7 @@ def make_temp_dir(prefix="dcc"):
         random_str = get_random_str()
         tmp = path.join(".tmp", prefix + random_str)
     os.mkdir(tmp)
+    tmp = os.path.normpath(tmp)
 
     return tmp
 
@@ -307,7 +308,7 @@ def move_unsigned(unsigned_apk, signed_apk):
     copy(unsigned_apk, signed_apk)
 
 
-def build_project(project_dir, num_processes=0):
+def build_project(project_dir):
     check_call([NDKBUILD, "-j%d" % cpu_count(), "-C", project_dir], stderr=STDOUT)
 
 
@@ -591,7 +592,9 @@ def write_compiled_methods(project_dir, compiled_methods):
         except Exception as e:
             print(f"{str(e)}\n")
 
-    with open(path.join(source_dir, "compiled_methods.txt"), "w", encoding="utf-8") as fp:
+    with open(
+        path.join(source_dir, "compiled_methods.txt"), "w", encoding="utf-8"
+    ) as fp:
         fp.write("\n".join(list(map("".join, compiled_methods.keys()))))
 
 
@@ -670,6 +673,9 @@ def get_application_name_from_manifest(apk_file):
     application_name = application_element.get(
         "{http://schemas.android.com/apk/res/android}name", ""
     )
+    # If application_name is not a full qualified name but a relative name (.SketchApplication)
+    if application_name.startswith("."):
+        application_name = a.package + application_name
     return application_name
 
 
@@ -852,6 +858,7 @@ def dcc_main(
     project_dir=None,
     source_archive="project-source.zip",
     dynamic_register=False,
+    disable_signing=False,
 ):
     if not path.exists(apkfile):
         Logger.error("Input apk file %s does not exist", apkfile)
@@ -1008,7 +1015,8 @@ def dcc_main(
 
             if is_windows():
                 modify_application_name(
-                    path.join(decompiled_dir, "AndroidManifest.xml"), application_class_name
+                    path.join(decompiled_dir, "AndroidManifest.xml"),
+                    application_class_name,
                 )
             else:
                 check_call(
@@ -1055,7 +1063,9 @@ def dcc_main(
                     None,
                 )
                 if locals_index is not None:
-                    loc = re.compile("(    (?:\\.locals|\\.registers) )(\\d+)\n").search(content[index + locals_index])
+                    loc = re.compile(
+                        "(    (?:\\.locals|\\.registers) )(\\d+)\n"
+                    ).search(content[index + locals_index])
                     if loc.group(2) == "0":
                         content[index + locals_index] = loc.group(1) + "1" + "\n"
                     content.insert(index + locals_index + 1, line_to_insert)
@@ -1085,7 +1095,8 @@ def dcc_main(
         )
         unsigned_apk = ApkTool.compile(decompiled_dir)
         zipalign(unsigned_apk, outapk)
-        sign(out_apk, outapk)
+        if not disable_signing:
+            sign(outapk, outapk)
 
 
 sys.setrecursionlimit(5000)
@@ -1141,6 +1152,12 @@ if __name__ == "__main__":
         default="project-source.zip",
         help="Converted cpp code, compressed as zip output file.",
     )
+    parser.add_argument(
+        "--disable-signing",
+        action="store_true",
+        default=False,
+        help="Disable APK signing.",
+    )
 
     args = vars(parser.parse_args())
     input_apk = args["input"]
@@ -1153,6 +1170,7 @@ if __name__ == "__main__":
     do_compile = not args["no_build"]
     source_archive = args["project_archive"]
     dynamic_register = args["dynamic_register"]
+    disable_signing = args["disable_signing"]
 
     if args["source_dir"]:
         project_dir = args["source_dir"]
@@ -1169,6 +1187,7 @@ if __name__ == "__main__":
             NDKBUILD = path.join(ndk_dir, "ndk-build.cmd")
         else:
             NDKBUILD = path.join(ndk_dir, "ndk-build")
+        NDKBUILD = os.path.normpath(NDKBUILD)
 
         if not path.exists(NDKBUILD):
             raise Exception("Invalid ndk_dir path, file not found at " + NDKBUILD)
@@ -1179,10 +1198,10 @@ if __name__ == "__main__":
     show_logging(level=INFO)
 
     # n
-    # Must be invoked first before invoking any other mehtod
+    # Must be invoked first before invoking any other method
     create_tmp_directory()
 
-    # Bakcing up jni folder because modifications will be made in runtime
+    # Backing up jni folder because modifications will be made in runtime
     backup_jni_folder_path = backup_jni_project_folder()
 
     try:
@@ -1196,6 +1215,7 @@ if __name__ == "__main__":
             project_dir,
             source_archive,
             dynamic_register,
+            disable_signing,
         )
     except Exception as e:
         Logger.error("Compile %s failed!" % input_apk, exc_info=True)
