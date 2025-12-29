@@ -3,7 +3,7 @@
 # Protect all methods in all classes
 # Not recommended for real world applications.
 # python dcc.py -a app-release-unsigned.apk -o app-release-unsigned.apk
-com.github.catvod.spider.Bili;.*
+# com.github.catvod.spider.Bili;.*
 com.github.catvod.spider.TgYunDouBanPan;.*
 com.github.catvod.spider.TgYunPanLocal;.*
 com.github.catvod.spider.Wogg;.*
