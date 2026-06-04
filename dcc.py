@@ -160,7 +160,12 @@ class ApkTool(object):
 
     @staticmethod
     def compile(decompiled_dir):
-        unsiged_apk = make_temp_file("-unsigned.apk")
+        unsiged_apk = path.join(".tmp", "app-release-unsigned.apk")
+        if path.exists(unsiged_apk):
+            try:
+                os.remove(unsiged_apk)
+            except Exception:
+                pass
         if is_windows():
             check_call(
                 [APKTOOL2, "b", "--advanced", "-o", unsiged_apk, decompiled_dir],
